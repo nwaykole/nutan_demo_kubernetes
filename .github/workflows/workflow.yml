@@ -67,19 +67,29 @@ jobs:
           MAVEN_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
   Deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - name: kubectl - Google Cloud GKE cluster.
-      uses: google-github-actions/get-gke-credentials@v2
-      env:
-        cluster_name: autopilot-cluster-1
-        PROJECT_ID: ${{ env.PROJECT_ID }}
-        APPLICATION_CREDENTIALS: ${{ secrets.GKE_SA_KEY }}
-        ZONE_NAME: ${{ env.GKE_ZONE }}
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - uses: actions/checkout@v4
+
+    # Step 1: Authenticate to Google Cloud
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
       with:
-        args: kubectl apply -f k8s/
+        credentials_json: ${{ secrets.GKE_SA_KEY }}
+
+    # Step 2: Get GKE credentials
+    - name: Get GKE credentials
+      uses: google-github-actions/get-gke-credentials@v2
+      with:
+        cluster_name: autopilot-cluster-1
+        location: us-central1
+        project_id: ${{ secrets.PROJECT_ID }}
+
+    # Step 3: Apply Kubernetes manifests
+    - name: Deploy to GKE
+      run: kubectl apply -f k8s/
+
 
 
 
