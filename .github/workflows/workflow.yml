@@ -74,9 +74,9 @@ jobs:
     - name: kubectl - Google Cloud GKE cluster.
       uses: google-github-actions/get-gke-credentials@v2
       env:
+        cluster_name: autopilot-cluster-1
         PROJECT_ID: ${{ env.PROJECT_ID }}
         APPLICATION_CREDENTIALS: ${{ secrets.GKE_SA_KEY }}
-        CLUSTER_NAME: ${{ env.GKE_CLUSTER }}
         ZONE_NAME: ${{ env.GKE_ZONE }}
       with:
         args: kubectl apply -f k8s/
